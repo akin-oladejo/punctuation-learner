@@ -12,9 +12,9 @@ class Loader:
         self._training_files = {} # path to training files
         self.verify_dataset(self._path) # verify dataset and populate training list
         self._puncs = self.extract_punc() # extract the punctuation in each book
-        self._data = self.conv_punc(self._puncs)
-        # print(self._data)
+        self._data = self.conv_punc(self._puncs) # convert the punctuation to numerical embeddings
         print_dict(self._data)
+        # self._train, self._test = self.split(self._data) # split data into train and test
 
         
     def verify_dataset(self, path_url):
@@ -94,13 +94,11 @@ class Loader:
         '''
         ret = {}
         for author, books in punc.items():
-            if not ret.get(author): ret[author] = [] #create dict identical 
+            if not ret.get(author): ret[author] = [] # create author elements, identical to self._punc
             for book in books:
-                ret[author].append(list(map(self.map_punc, book)))
+                # convert punctuations to numerical representations
+                ret[author].append(list(map(lambda x: self._punc_map[x], book))) 
         return ret
-    
-    def map_punc(self, punc):
-        return(self._punc_map[punc])
 
     def puncs(self):
         return self._puncs
