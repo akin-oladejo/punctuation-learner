@@ -31,9 +31,10 @@ def warn(msg, typ='exception'): #print colored text to terminal
 """-----------------------------------Utility Divider-----------------------------------------"""
 
 # custom function for better dictionary output
-def print_dict(obj:dict):
-    for el in obj: #list each entry, seperated by a line with green background
+def print_dict(obj:dict)->None:
+    for el, val in obj.items(): #list each entry, seperated by a line with green background
         print(el)
+        print(val)
         print(Back.GREEN+'\n')
         print(Style.RESET_ALL)
 

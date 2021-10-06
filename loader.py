@@ -12,14 +12,14 @@ class Loader:
         self._training_files = {} # path to training files
         self.verify_dataset(self._path) # verify dataset and populate training list
         self._puncs = self.extract_punc() # extract the punctuation in each book
-        print(self._puncs)
-        # self._conv = map(self.conv_punc, self._punc)
-        # self.conv()
+        self._data = self.conv_punc(self._puncs)
+        # print(self._data)
+        print_dict(self._data)
 
         
     def verify_dataset(self, path_url):
-        # logic to verify that the dataset exists, contains sub-authors, warn if there are stray files/folders
-        # and make sure that the sub folders (which should house an author's books) contain .txt files
+        '''logic to verify that the dataset exists, contains sub-authors, warn if there are stray files/folders
+        and make sure that the sub folders (which should house an author's books) contain .txt files'''
 
         if path.exists(path_url): # check that path exists
             if path.isdir(path_url): # check that path is a folder
@@ -67,26 +67,43 @@ class Loader:
         else: warn("Path does not exist! Stap playin' wimme")
 
 
-    # write a function that creates a dictionary. Each key represents an author. 
-    # The value of that key is a list that contains the punctuation in each book
     def extract_punc(self):
-        # write logic to extract punc from only the actual text, maybe by stripping the pre and post sections
-        
+        '''create a dictionary. Each key represents an author. The value of that key is a list that
+        contains each book's punctuation as seperate sub-lists'''
         ret = {}
         for i, j in self._training_files.items():
             for book in j:
-                book_name = book.split('/')[-1]
+                # book_name = book.split('/')[-1]
                 with open(book) as f:
                     text = f.read()
                     if not ret.get(i): ret[i] = []
-                    ret[i].append({book_name:[i for i in text if i in string.punctuation]})
+                    # ret[i].append({book_name:[i for i in text if i in string.punctuation]})
+                    ret[i].append([i for i in text if i in string.punctuation])
         return ret
 
-    def conv_punc(self, punc):
+    def conv_punc(self, punc:dict)->dict:
+        '''
+        Convert the punctuation of the books to numerical representation
+        Parameter
+        ---------
+        punc: dict : this is the dictionary that contains the punctuations of all the books
+
+        returns
+        -------`
+        ret: dict: this is the converted (to numbers) version of the punctuation of all the books
+        '''
+        ret = {}
+        for author, books in punc.items():
+            if not ret.get(author): ret[author] = [] #create dict identical 
+            for book in books:
+                ret[author].append(list(map(self.map_punc, book)))
+        return ret
+    
+    def map_punc(self, punc):
         return(self._punc_map[punc])
 
-    def punc(self):
-        return self._punc
+    def puncs(self):
+        return self._puncs
 
-    def conv(self):
-        print(list(self._conv))
+    def data(self):
+        print(self._data)
