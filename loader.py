@@ -13,15 +13,16 @@ class Loader:
         self.verify_dataset(self._path) # verify dataset and populate training list
         self._puncs = self.extract_punc() # extract the punctuation in each book
         self._data = self.conv_punc(self._puncs) # convert the punctuation to numerical embeddings
-        print(self._training_files)
-        # print_dict(self._data)
-        # self._train, self._test = self.split(self._data) # split data into train and test
+        self._train, self._valid = self.split_data(self._data) # split data into train and validation subsets
+        print(self._train)
+        print('--------------------')
+        print(self._valid)
 
         
     def verify_dataset(self, path_url):
         '''logic to verify that the dataset exists, contains sub-authors, warn if there are stray files/folders,
         make sure that the sub folders (which should house an author's books) contain .txt files
-        and there are at least two .txt files for each other so test-train can occur'''
+        and there are at least two .txt files for each other so train-validate can occur'''
 
         if path.exists(path_url): # check that path exists
             if path.isdir(path_url): # check that path is a folder
@@ -66,18 +67,14 @@ class Loader:
                                             self._training_files[l1_sub].append(sub_path2) # add file path to author list
                                 
                         
-                        # for train-test purposes, at least two books are needed for each author
+                        # for train-validate purposes, at least two books are needed for each author
                         if txt_count < 2:
                             self._training_files.pop(l1_sub)
                             warn(f"At least two works by '{l1_sub}' are needed to train, {txt_count} found. 'Data! We need more data!'", typ='special')
-                        # print(l1_sub, 'Number of txt files found',txt_count)
                         
                 if len(self._training_files)==0: # if no .txt files found at all
                     warn("No author found in directory after search!")
                 
-                # # for train-test purposes, at least two books are needed for each author
-                # if txt_count < 2:
-                #     warn('At least two valid .txt files are needed to train!')
             else: warn("Path is not a directory! :(")
         else: warn("Path does not exist! Stap playin' wimme")
 
@@ -95,6 +92,7 @@ class Loader:
                     # ret[i].append({book_name:[i for i in text if i in string.punctuation]})
                     ret[i].append([i for i in text if i in string.punctuation])
         return ret
+
 
     def conv_punc(self, punc:dict)->dict:
         '''
@@ -115,8 +113,22 @@ class Loader:
                 ret[author].append(list(map(lambda x: self._punc_map[x], book))) 
         return ret
 
+
+    def split_data(self, data)->tuple:
+        '''
+        Split the data so that the last book by each author becomes validation data
+        '''
+        train = {}
+        valid = {}
+        for author in data.keys():
+            train[author] = data[author][:-1]
+            valid[author] = data[author][-1]
+        return train, valid
+
+
     def puncs(self):
         return self._puncs
+
 
     def data(self):
         print(self._data)
