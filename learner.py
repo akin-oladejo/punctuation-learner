@@ -2,9 +2,10 @@ import numpy as np
 
 from loader import Loader
 
-# 
+# maybe consider removing the sigmoid step from the model
+# maybe consider removing the sigmoid step from the model
 class Learner:
-    def __init__(self, lr):
+    def __init__(self, lr=0.1):
         np.random.seed(32) # set seed
         self._lr = lr
 
@@ -33,14 +34,13 @@ class Learner:
         return f'Bias:\n {self._bias}'
 
     def params(self):
-        weights = self.weights()
-        bias = self.bias()
-        return weights + '\n' +bias
+        return self.weights() + '\n' + self.bias()
 
-    def model(self, w=None, b=None):
+    def model(self, input=None, w=None, b=None):
         if not isinstance(w, np.ndarray): w = self._weights
         if not b: b = self._bias
-        return self.sigmoid(np.dot(self._features, w) + b)
+        if not input: input = self._features
+        return self.sigmoid(np.dot(input, w) + b)
 
     def grad_w(self, loc, delta):
         # calculate gradient of weight
@@ -79,14 +79,14 @@ class Learner:
         plt.xlabel(x_label)
         plt.ylabel(y_label)
 
-    def train(self, features, label, epochs=30, plot=False):
+    def train(self, features, label, epochs=150, plot=False):
         self._weights = np.random.rand(features.shape[-1], 1) # initialize weights
         self._bias = np.random.rand(1) # initialize bias
         self._loss = [] # track loss
-        print(f'Parameters before fitting:\n{model.params()}\n-------')
         self._epoch = [] # track epoch
         self._features = features # store input
         self._label = label # store output
+        print(f'Parameters before fitting:\n{self.params()}\n-------')
         for i in range(epochs):
             preds = self.model()
             loss = self.mse(preds)
@@ -94,10 +94,7 @@ class Learner:
             self._epoch.append(i) # add to epoch counter
             self._loss.append(self.mse(preds))
         if plot == True: self.plot_loss(self._epoch, self._loss, 'epoch', 'loss', 'Training Progress')
-        print(f'\n-------\nParameters after fitting:\n{model.params()}')
+        print(f'\n-------\nParameters after fitting:\n{self.params()}')
 
-    def test(self): 
-        ... # use a metric, not a loss
-
-    # def 
-
+    def predict(self, input): 
+        return 1 if self.model(input).item() > 0.5 else 0
