@@ -5,7 +5,7 @@ from utils import warn, print_dict
 import string
 
 class Loader:
-    def __init__(self, path_url):
+    def __init__(self, path_url, batch_size = None):
         agr = string.punctuation # list punctuations
         self._punc_map = dict(zip(agr, range(len(agr)))) # create a mapping of punctuation to number
         self._path = path_url
@@ -14,11 +14,16 @@ class Loader:
         self._puncs = self.extract_punc() # extract the punctuation in each book
         self._data = self.conv_punc(self._puncs) # convert the punctuation to numerical embeddings
         self._train, self._valid = self.split_data(self._data) # split data into train and validation subsets
-        print(self._train)
-        print('--------------------')
-        print(self._valid)
-
+        print(self._data)
         
+        # test batches
+        # for i in range(batch_size):
+        #     self.load() #yield a batch
+
+    def batch_size(i = None):
+        ...
+        
+
     def verify_dataset(self, path_url):
         '''logic to verify that the dataset exists, contains sub-authors, warn if there are stray files/folders,
         make sure that the sub folders (which should house an author's books) contain .txt files
@@ -131,4 +136,8 @@ class Loader:
 
 
     def data(self):
-        print(self._data)
+        return(self._data)
+
+    
+    def load(self):
+        ...
