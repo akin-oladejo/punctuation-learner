@@ -1,8 +1,9 @@
 import numpy as np
+import matplotlib.pyplot as plt
+%matplotlib inline
 
 from loader import Loader
 
-# maybe consider removing the sigmoid step from the model
 # maybe consider removing the sigmoid step from the model
 class Learner:
     def __init__(self, lr=0.1):
@@ -98,3 +99,4 @@ class Learner:
 
     def predict(self, input): 
         return 1 if self.model(input).item() > 0.5 else 0
+
